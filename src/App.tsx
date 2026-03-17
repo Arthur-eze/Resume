@@ -82,6 +82,14 @@ export default function App() {
           <span className="text-xl font-black tracking-tighter glow-text">PRORESUME</span>
         </div>
         <div className="flex items-center gap-6">
+          {showResults && resumeData && (
+            <button
+              onClick={downloadPDF}
+              className="hidden md:flex items-center gap-2 px-4 py-2 rounded-lg bg-accent/10 border border-accent/20 text-accent hover:bg-accent/20 transition-all font-bold text-sm"
+            >
+              <Download size={16} /> DOWNLOAD
+            </button>
+          )}
           <div className="relative group cursor-pointer">
             <div className="absolute -inset-2 bg-accent/20 rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition duration-500"></div>
             <div className="relative px-4 py-2 rounded-lg border border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 transition-all">
@@ -108,14 +116,25 @@ export default function App() {
             className="text-6xl md:text-8xl font-black tracking-tighter mb-6 leading-none flex flex-col items-center"
           >
             <span>CRAFT YOUR</span>
-            <input
-              type="text"
-              value={craftText}
-              onChange={(e) => setCraftText(e.target.value.toUpperCase())}
-              className="bg-transparent text-center border-none outline-none text-transparent bg-clip-text bg-gradient-to-r from-accent to-purple-400 glow-text w-full max-w-4xl cursor-text placeholder:opacity-20"
-              placeholder="ENTER TEXT"
-              spellCheck={false}
-            />
+            {showResults && resumeData ? (
+              <motion.button
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                onClick={downloadPDF}
+                className="mt-4 px-12 py-6 rounded-2xl bg-accent text-white font-bold text-2xl md:text-4xl glow-border hover:scale-105 transition-all flex items-center gap-4 animate-float shadow-[0_0_50px_rgba(168,85,247,0.4)]"
+              >
+                <Download size={40} /> DOWNLOAD PDF
+              </motion.button>
+            ) : (
+              <input
+                type="text"
+                value={craftText}
+                onChange={(e) => setCraftText(e.target.value.toUpperCase())}
+                className="bg-transparent text-center border-none outline-none text-transparent bg-clip-text bg-gradient-to-r from-accent to-purple-400 glow-text w-full max-w-4xl cursor-text placeholder:opacity-20"
+                placeholder="ENTER TEXT"
+                spellCheck={false}
+              />
+            )}
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
