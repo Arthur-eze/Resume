@@ -35,7 +35,7 @@ export default function ResumePreview({ data, previewRef }: ResumePreviewProps) 
         <section>
           <h2 className="text-lg font-bold uppercase tracking-wider mb-4 border-b border-white/20 pb-1">Skills</h2>
           <ul className="space-y-2 text-sm text-white/90">
-            {data.skills.map((skill, i) => (
+            {data.skills?.map((skill, i) => (
               skill && <li key={i} className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 bg-white/40 rounded-full" />
                 {skill}
@@ -49,7 +49,7 @@ export default function ResumePreview({ data, previewRef }: ResumePreviewProps) 
           <section>
             <h2 className="text-lg font-bold uppercase tracking-wider mb-4 border-b border-white/20 pb-1">Languages</h2>
             <ul className="space-y-2 text-sm text-white/90">
-              {data.languages.map((lang, i) => (
+              {data.languages?.map((lang, i) => (
                 <li key={i} className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 bg-white/40 rounded-full" />
                   {lang}
@@ -64,7 +64,7 @@ export default function ResumePreview({ data, previewRef }: ResumePreviewProps) 
           <section>
             <h2 className="text-lg font-bold uppercase tracking-wider mb-4 border-b border-white/20 pb-1">Hobbies</h2>
             <ul className="space-y-2 text-sm text-white/90">
-              {data.hobbies.map((hobby, i) => (
+              {data.hobbies?.map((hobby, i) => (
                 <li key={i} className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 bg-white/40 rounded-full" />
                   {hobby}
@@ -79,10 +79,10 @@ export default function ResumePreview({ data, previewRef }: ResumePreviewProps) 
       <main className="w-[70%] p-12 bg-white">
         <header className="mb-12">
           <h1 className="text-5xl font-bold text-zinc-900 uppercase tracking-tight mb-2">
-            {data.personalInfo.fullName || 'Your Name'}
+            {data.personalInfo?.fullName || 'Your Name'}
           </h1>
           <p className="text-xl text-zinc-600 font-medium tracking-wide">
-            {data.experience[0]?.position || 'Professional Title'}
+            {data.experience?.[0]?.position || 'Professional Title'}
           </p>
         </header>
 
@@ -98,7 +98,7 @@ export default function ResumePreview({ data, previewRef }: ResumePreviewProps) 
         <section className="mb-10">
           <h2 className="text-xl font-bold uppercase tracking-widest mb-2 border-b-2 border-zinc-900 pb-1 inline-block">Work Experience</h2>
           <div className="space-y-8 mt-6">
-            {data.experience.map((exp, i) => (
+            {data.experience?.map((exp, i) => (
               <div key={i}>
                 <div className="flex justify-between items-baseline mb-1">
                   <h3 className="font-bold text-lg text-zinc-900">{exp.position || 'Position'}</h3>
@@ -108,7 +108,7 @@ export default function ResumePreview({ data, previewRef }: ResumePreviewProps) 
                   {exp.company}
                 </div>
                 <ul className="space-y-2">
-                  {exp.description.split('\n').map((line, j) => (
+                  {exp.description?.split('\n').map((line, j) => (
                     line.trim() && (
                       <li key={j} className="text-zinc-700 text-sm flex gap-3">
                         <span className="mt-1.5 w-1.5 h-1.5 bg-zinc-900 rounded-full flex-shrink-0" />
@@ -126,7 +126,7 @@ export default function ResumePreview({ data, previewRef }: ResumePreviewProps) 
         <section>
           <h2 className="text-xl font-bold uppercase tracking-widest mb-2 border-b-2 border-zinc-900 pb-1 inline-block">Education</h2>
           <div className="space-y-6 mt-6">
-            {data.education.map((edu, i) => (
+            {data.education?.map((edu, i) => (
               <div key={i}>
                 <div className="flex justify-between items-baseline mb-1">
                   <h3 className="font-bold text-zinc-900">{edu.degree || 'Degree'}</h3>

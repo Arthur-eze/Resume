@@ -179,7 +179,8 @@ export async function refineResumeContent(data: ResumeData): Promise<ResumeData>
             type: Type.ARRAY,
             items: { type: Type.STRING }
           }
-        }
+        },
+        required: ["personalInfo", "experience", "education", "skills", "languages", "hobbies"]
       }
     }
   });
