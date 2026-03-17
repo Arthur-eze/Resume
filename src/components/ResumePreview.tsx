@@ -18,15 +18,15 @@ export default function ResumePreview({ data, previewRef }: ResumePreviewProps) 
           <div className="space-y-4 text-sm">
             <div>
               <div className="font-bold text-xs uppercase text-white/60 mb-1">Address</div>
-              <div className="text-white/90">{data.personalInfo.location || 'Your Location'}</div>
+              <div className="text-white/90">{data.personalInfo?.location || 'Your Location'}</div>
             </div>
             <div>
               <div className="font-bold text-xs uppercase text-white/60 mb-1">Phone</div>
-              <div className="text-white/90">{data.personalInfo.phone || 'Your Phone'}</div>
+              <div className="text-white/90">{data.personalInfo?.phone || 'Your Phone'}</div>
             </div>
             <div>
               <div className="font-bold text-xs uppercase text-white/60 mb-1">Email</div>
-              <div className="text-white/90 break-all">{data.personalInfo.email || 'Your Email'}</div>
+              <div className="text-white/90 break-all">{data.personalInfo?.email || 'Your Email'}</div>
             </div>
           </div>
         </section>
@@ -90,7 +90,7 @@ export default function ResumePreview({ data, previewRef }: ResumePreviewProps) 
         <section className="mb-10">
           <h2 className="text-xl font-bold uppercase tracking-widest mb-2 border-b-2 border-zinc-900 pb-1 inline-block">Profile</h2>
           <p className="text-zinc-700 leading-relaxed mt-4">
-            {data.personalInfo.summary || 'Summary will appear here...'}
+            {data.personalInfo?.summary || 'Summary will appear here...'}
           </p>
         </section>
 
