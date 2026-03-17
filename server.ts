@@ -71,6 +71,16 @@ async function startServer() {
 
   app.use(express.json());
 
+  // Debug Route
+  app.get("/api/debug/env", (req, res) => {
+    res.json({
+      keys: Object.keys(process.env).filter(k => !k.startsWith('npm_') && !k.startsWith('NODE_')),
+      hasGemini: !!process.env.GEMINI_API_KEY,
+      hasNvidia: !!process.env.NVIDIA_API_KEY,
+      nodeEnv: process.env.NODE_ENV,
+    });
+  });
+
   // API Routes
   app.post("/api/ai/parse", async (req, res) => {
     try {

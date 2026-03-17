@@ -8,12 +8,23 @@ async function callBackend(endpoint: string, body: any): Promise<any> {
     body: JSON.stringify(body),
   });
 
+  const contentType = response.headers.get('content-type');
   if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || 'Failed to call AI service');
+    if (contentType && contentType.includes('application/json')) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to call AI service');
+    } else {
+      const text = await response.text();
+      throw new Error(`Server error (${response.status}): ${text.slice(0, 100)}...`);
+    }
   }
 
-  return response.json();
+  if (contentType && contentType.includes('application/json')) {
+    return response.json();
+  } else {
+    const text = await response.text();
+    throw new Error(`Expected JSON but got: ${text.slice(0, 100)}...`);
+  }
 }
 
 export async function parseResumeInput(input: string): Promise<ResumeData> {
