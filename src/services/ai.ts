@@ -1,10 +1,16 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { ResumeData, EvaluationData } from "../types";
 
-const apiKey = process.env.GEMINI_API_KEY || '';
-const ai = new GoogleGenAI({ apiKey });
+const getAI = () => {
+  const key = process.env.GEMINI_API_KEY;
+  if (!key) {
+    throw new Error('Gemini API Key is missing. Please ensure it is set in the environment variables.');
+  }
+  return new GoogleGenAI({ apiKey: key });
+};
 
 export async function parseResumeInput(input: string): Promise<ResumeData> {
+  const ai = getAI();
   const prompt = `
     Extract resume information from the following natural language input. 
     If some information is missing, use reasonable placeholders or leave empty.
@@ -79,6 +85,7 @@ export async function parseResumeInput(input: string): Promise<ResumeData> {
 }
 
 export async function evaluateResume(data: ResumeData): Promise<EvaluationData> {
+  const ai = getAI();
   const prompt = `
     Evaluate the following resume data based on five criteria: Clarity, Skill, Experience, Education, and Work.
     Provide a score out of 100 for each, an overall score, and a brief professional feedback.
@@ -118,6 +125,7 @@ export async function evaluateResume(data: ResumeData): Promise<EvaluationData> 
 }
 
 export async function refineResumeContent(data: ResumeData): Promise<ResumeData> {
+  const ai = getAI();
   const prompt = `
     Refine the following resume content to be more professional and impactful. 
     Keep the same structure but improve the language, especially the summary and experience descriptions.

@@ -17,6 +17,7 @@ export default function App() {
   const [evaluation, setEvaluation] = useState<EvaluationData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   const previewRef = useRef<HTMLDivElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
@@ -27,6 +28,7 @@ export default function App() {
 
   const handleGenerate = async (input: string) => {
     setIsLoading(true);
+    setError(null);
     try {
       // 1. Parse natural language input
       const parsedData = await parseResumeInput(input);
@@ -43,8 +45,9 @@ export default function App() {
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: 'smooth' });
       }, 100);
-    } catch (error) {
-      console.error('Error generating resume:', error);
+    } catch (err: any) {
+      console.error('Error generating resume:', err);
+      setError(err.message || 'An unexpected error occurred while generating your resume. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -149,6 +152,16 @@ export default function App() {
             <p className="text-zinc-500">Describe your career in your own words, and we'll handle the rest.</p>
           </div>
           <SimpleResumeForm onSubmit={handleGenerate} isLoading={isLoading} />
+          
+          {error && (
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-8 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-center max-w-2xl mx-auto"
+            >
+              {error}
+            </motion.div>
+          )}
         </div>
       </section>
 
