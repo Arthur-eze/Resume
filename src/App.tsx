@@ -9,6 +9,8 @@ import EvaluationSection from './components/EvaluationSection';
 import { evaluateResume, refineResumeContent, parseResumeInput } from './services/ai';
 import { ResumeData, EvaluationData } from './types';
 
+import { CrackersLogo } from './components/CrackersLogo';
+
 export default function App() {
   const [craftText, setCraftText] = useState('FUTURE');
   const [resumeData, setResumeData] = useState<ResumeData | null>(null);
@@ -77,7 +79,12 @@ export default function App() {
           <span className="text-xl font-black tracking-tighter glow-text">PRORESUME</span>
         </div>
         <div className="flex items-center gap-6">
-          {/* Options removed as requested */}
+          <div className="relative group cursor-pointer">
+            <div className="absolute -inset-2 bg-accent/20 rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition duration-500"></div>
+            <div className="relative px-4 py-2 rounded-lg border border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 transition-all">
+              <CrackersLogo />
+            </div>
+          </div>
         </div>
       </nav>
 
