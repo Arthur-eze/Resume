@@ -12,6 +12,11 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react(), tailwindcss()],
     base: './',
+    build: {
+      outDir: 'dist',
+      assetsDir: 'assets',
+      emptyOutDir: true,
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

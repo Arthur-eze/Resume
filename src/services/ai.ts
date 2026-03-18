@@ -15,7 +15,7 @@ const getGeminiAI = () => {
 async function callAI(prompt: string, schema: any, endpoint: string): Promise<any> {
   // FORCED TESTING: Skipping Gemini frontend and going straight to backend (Nvidia)
   console.log("FORCED TEST: Calling backend for AI generation (Nvidia)...");
-  const response = await fetch(`/api/ai/${endpoint}`, {
+  const response = await fetch(`api/ai/${endpoint}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ prompt, schema }),
