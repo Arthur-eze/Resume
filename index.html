@@ -8,11 +8,26 @@
       window.process = window.process || {};
       window.process.env = window.process.env || {};
       if (!window.process.env.NODE_ENV) window.process.env.NODE_ENV = 'production';
+
+      // Suppress Vite WebSocket errors which are expected in this environment
+      const originalError = console.error;
+      console.error = (...args) => {
+        if (args[0] && typeof args[0] === 'string' && (args[0].includes('[vite] failed to connect to websocket') || args[0].includes('WebSocket closed without opened'))) {
+          return;
+        }
+        originalError.apply(console, args);
+      };
+
+      window.addEventListener('unhandledrejection', (event) => {
+        if (event.reason && event.reason.message && event.reason.message.includes('WebSocket closed without opened')) {
+          event.preventDefault();
+        }
+      });
     </script>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="src/main.tsx"></script>
   </body>
 </html>
 

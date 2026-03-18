@@ -1,11 +1,24 @@
-import { Type } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { ResumeData, EvaluationData } from "../types";
 
-async function callBackend(endpoint: string, body: any): Promise<any> {
+// Gemini should ALWAYS be called from the frontend in this environment
+const getGeminiAI = () => {
+  // The platform injects GEMINI_API_KEY into the environment
+  const apiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || (process as any).env?.GEMINI_API_KEY;
+  if (!apiKey) {
+    console.warn("GEMINI_API_KEY not found in frontend environment");
+    return null;
+  }
+  return new GoogleGenAI({ apiKey });
+};
+
+async function callAI(prompt: string, schema: any, endpoint: string): Promise<any> {
+  // FORCED TESTING: Skipping Gemini frontend and going straight to backend (Nvidia)
+  console.log("FORCED TEST: Calling backend for AI generation (Nvidia)...");
   const response = await fetch(`/api/ai/${endpoint}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ prompt, schema }),
   });
 
   const contentType = response.headers.get('content-type');
@@ -91,7 +104,7 @@ export async function parseResumeInput(input: string): Promise<ResumeData> {
     required: ["personalInfo", "experience", "education", "skills", "languages", "hobbies"]
   };
 
-  return callBackend('parse', { input: prompt, schema });
+  return callAI(prompt, schema, 'parse');
 }
 
 export async function evaluateResume(data: ResumeData): Promise<EvaluationData> {
@@ -123,7 +136,7 @@ export async function evaluateResume(data: ResumeData): Promise<EvaluationData> 
     required: ["overallScore", "criteria", "feedback"]
   };
 
-  return callBackend('evaluate', { prompt, schema });
+  return callAI(prompt, schema, 'evaluate');
 }
 
 export async function refineResumeContent(data: ResumeData): Promise<ResumeData> {
@@ -187,5 +200,5 @@ export async function refineResumeContent(data: ResumeData): Promise<ResumeData>
     required: ["personalInfo", "experience", "education", "skills", "languages", "hobbies"]
   };
 
-  return callBackend('refine', { prompt, schema });
+  return callAI(prompt, schema, 'refine');
 }

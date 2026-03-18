@@ -13,13 +13,6 @@ console.log('Available Environment Variables:', Object.keys(process.env).filter(
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const getGeminiAI = () => {
-  const key = process.env.GEMINI_API_KEY;
-  console.log('Checking GEMINI_API_KEY:', key ? 'Found' : 'Not Found');
-  if (!key) return null;
-  return new GoogleGenAI({ apiKey: key });
-};
-
 const getNvidiaAI = () => {
   const key = process.env.NVIDIA_API_KEY;
   console.log('Checking NVIDIA_API_KEY:', key ? 'Found' : 'Not Found');
@@ -32,7 +25,6 @@ const getNvidiaAI = () => {
 
 async function generateJSON(prompt: string, schema: any): Promise<any> {
   const nvidia = getNvidiaAI();
-  const gemini = getGeminiAI();
 
   if (nvidia) {
     const response = await nvidia.chat.completions.create({
@@ -46,33 +38,30 @@ async function generateJSON(prompt: string, schema: any): Promise<any> {
     return JSON.parse(response.choices[0].message.content || "{}");
   }
 
-  if (gemini) {
-    const response = await gemini.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: schema
-      }
-    });
-    return JSON.parse(response.text);
-  }
-
-  const missing = [];
-  if (!process.env.GEMINI_API_KEY) missing.push('GEMINI_API_KEY');
-  if (!process.env.NVIDIA_API_KEY) missing.push('NVIDIA_API_KEY');
-  
-  throw new Error(`No AI API Key found. Checked: ${missing.join(', ')}. Please ensure these are set in the Secrets menu.`);
+  throw new Error(`NVIDIA_API_KEY not found on server. Please ensure it is set in the Secrets menu.`);
 }
 
 async function startServer() {
+  console.log('Starting server initialization...');
   const app = express();
   const PORT = 3000;
 
   app.use(express.json());
 
+  // Request logger
+  app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+  });
+
+  // Health check
+  app.get("/api/health", (req, res) => {
+    res.json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
   // Debug Route
   app.get("/api/debug/env", (req, res) => {
+    console.log('Debug route hit');
     res.json({
       keys: Object.keys(process.env).filter(k => !k.startsWith('npm_') && !k.startsWith('NODE_')),
       hasGemini: !!process.env.GEMINI_API_KEY,
@@ -82,44 +71,34 @@ async function startServer() {
   });
 
   // API Routes
-  app.post("/api/ai/parse", async (req, res) => {
-    try {
-      const { input, schema } = req.body;
-      const result = await generateJSON(input, schema);
-      res.json(result);
-    } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  app.post("/api/ai/evaluate", async (req, res) => {
+  app.post("/api/ai/:action", async (req, res) => {
+    const { action } = req.params;
+    console.log(`POST /api/ai/${action} hit`);
     try {
       const { prompt, schema } = req.body;
       const result = await generateJSON(prompt, schema);
       res.json(result);
     } catch (error: any) {
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-  app.post("/api/ai/refine", async (req, res) => {
-    try {
-      const { prompt, schema } = req.body;
-      const result = await generateJSON(prompt, schema);
-      res.json(result);
-    } catch (error: any) {
+      console.error(`Error in /api/ai/${action}:`, error);
       res.status(500).json({ error: error.message });
     }
   });
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
+    console.log('Initializing Vite middleware...');
+    try {
+      const vite = await createViteServer({
+        server: { middlewareMode: true },
+        appType: "spa",
+      });
+      app.use(vite.middlewares);
+      console.log('Vite middleware initialized');
+    } catch (e) {
+      console.error('Failed to initialize Vite middleware:', e);
+    }
   } else {
+    console.log('Serving static files from dist/');
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
@@ -128,8 +107,18 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server is listening on 0.0.0.0:${PORT}`);
   });
 }
 
-startServer();
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+startServer().catch(err => {
+  console.error('Failed to start server:', err);
+});
